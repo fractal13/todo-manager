@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# for my fork of gkeepapi
+gkeepapi
+
+# emacs
+*~

@@ -65,22 +65,54 @@ def getTodoNote(keep, query="TODO Managed"):
         raise Exception("No notes match query: '" + str(query) + "'")
     return note
 
-def sortByParagraph(text):
+def parseIntoParagraphs(text):
     lines = text.split("\n")
-    sorted_lines = []
-    current_line = ""
+    paragraphs = []
+    current_paragraph = ""
     for line in lines:
-        if len(current_line) > 0:
-            current_line += "\n"
-        current_line += line
+        if len(current_paragraph) > 0:
+            current_paragraph += "\n"
+        current_paragraph += line
         if re.match('^[ \t]*$', line):
-            sorted_lines.append(current_line)
-            current_line = ""
+            paragraphs.append(current_paragraph)
+            current_paragraph = ""
             
-    if len(current_line) > 0:
-        sorted_lines.append(current_line)
-        current_line = ""
+    if len(current_paragraph) > 0:
+        paragraphs.append(current_paragraph)
+        current_paragraph = ""
 
-    sorted_lines = sorted(sorted_lines)
-    sorted_text = "\n".join(sorted_lines)
+    return paragraphs
+
+def sort_key(text):
+    default_key = 100.0
+    first_line = text.split("\n")[0]
+    match = re.match("^.*(@([^#]*))?(#([^ ]*))?.*$", first_line)
+    match = re.match("^.*(@([^#]*))(#([.]+))?(.*)$", first_line)
+    if match:
+        priority = match.group(4)
+        if priority is not None:
+            try:
+                key = float(priority)
+            except ValueError:
+                key = default_key
+                print("----> using default_key:", first_line)
+        else:
+            key = default_key
+            print("---> using default_key:", first_line)
+            print(match.group(1))
+            print(match.group(2))
+            print(match.group(3))
+            print(match.group(4))
+            print(match.group(5))
+                
+    else:
+        print("--> using default_key:", first_line)
+        key = default_key
+    return key
+
+def sortByParagraph(text):
+    paragraphs = parseIntoParagraphs(text)
+    sorted_paragraphs = sorted(paragraphs, key=sort_key)
+    sorted_text = "\n".join(sorted_paragraphs)
     return sorted_text
+

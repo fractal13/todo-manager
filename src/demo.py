@@ -15,8 +15,8 @@ def main(argv):
 
     text = todo_manager.sortByParagraph(note.text)
     print(text)
-    note.text = text
-    keep.sync()
+    #note.text = text
+    #keep.sync()
     return
 
 if __name__ == "__main__":
